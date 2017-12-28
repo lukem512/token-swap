@@ -74,9 +74,10 @@ contract('TokenSwap', function(accounts) {
   });
 
   it("seller should have correct amount of Ether", function() {
+    var oldBalance, newBalance;
+
     return TokenSwap.deployed().then(function(instance) {
       ts = instance;
-      var oldBalance, newBalance;
 
       return ts.create(token.address, amount, price, seller, buyer, {from: buyer});
     }).then(function() {
@@ -88,5 +89,10 @@ contract('TokenSwap', function(accounts) {
       newBalance = web3.eth.getBalance(seller);
       return assert.equal(oldBalance.toNumber() + price, newBalance.toNumber());
     });
+  });
+
+  it("buyer should be refunded extra Ether", function() {
+    var extra = 100000;
+    // TODO
   });
 });

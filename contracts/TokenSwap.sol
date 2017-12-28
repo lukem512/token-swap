@@ -79,9 +79,8 @@ contract TokenSwap {
     swap.seller.transfer(swap.price);
 
     // Refund buyer if overpaid
-    uint refund = swap.price - msg.value;
-    if (refund > 0) {
-      msg.sender.transfer(swap.price - msg.value);
+    if (msg.value > swap.price) {
+      msg.sender.transfer(msg.value - swap.price);
     }
 
     // Clean up storage
