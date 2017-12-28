@@ -33,7 +33,6 @@ contract TokenSwap {
   struct Swap {
     address token;           // Address of the token contract
     uint tokenAmount;        // Number of tokens requested
-    bool tokenReceived;
     uint price;              // Price to be paid by buyer
     address seller;          // Seller's address (holder of tokens)
     address recipient;       // Address to receive the tokens
@@ -42,7 +41,7 @@ contract TokenSwap {
   mapping (address => Swap) public Swaps;
 
   function create(address token, uint tokenAmount, uint price, address seller, address buyer, address recipient) public {
-    Swaps[buyer] = Swap(token, tokenAmount, false, price, seller, recipient);
+    Swaps[buyer] = Swap(token, tokenAmount, price, seller, recipient);
   }
 
   function create(address token, uint tokenAmount, uint price, address seller, address buyer) public {
@@ -61,13 +60,8 @@ contract TokenSwap {
     IToken token = IToken(swap.token);
 
     // Has the seller approved the tokens?
-    if (!swap.tokenReceived) {
-      uint tokenAllowance = token.allowance(swap.seller, this);
-      if (tokenAllowance >= swap.tokenAmount) {
-        swap.tokenReceived = true;
-      }
-    }
-    require(swap.tokenReceived);
+    uint tokenAllowance = token.allowance(swap.seller, this);
+    require(tokenAllowance >= swap.tokenAmount);
 
     // Ensure message value is above agreed price
     require(msg.value >= swap.price);
