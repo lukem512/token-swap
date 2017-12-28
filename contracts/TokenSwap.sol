@@ -1,7 +1,8 @@
 pragma solidity ^0.4.17;
 
 // Exchange ERC20 tokens and Ether
-// https://github.com/axic/ethereum-tokenescrow
+// Luke Mitchell <hi@lukemitchell.co>
+// Adapted from https://github.com/axic/ethereum-tokenescrow
 
 // Usage:
 // 1. call `create` to begin the swap
@@ -32,15 +33,16 @@ contract TokenSwap {
   struct Swap {
     address token;           // Address of the token contract
     uint tokenAmount;        // Number of tokens requested
+    bool tokenReceived;
     uint price;              // Price to be paid by buyer
-    address seller;          // Seller's address
+    address seller;          // Seller's address (holder of tokens)
     address recipient;       // Address to receive the tokens
   }
 
   mapping (address => Swap) public Swaps;
 
   function create(address token, uint tokenAmount, uint price, address seller, address buyer, address recipient) public {
-    Swaps[buyer] = Swap(token, tokenAmount, price, seller, recipient);
+    Swaps[buyer] = Swap(token, tokenAmount, false, price, seller, recipient);
   }
 
   function create(address token, uint tokenAmount, uint price, address seller, address buyer) public {
@@ -48,7 +50,7 @@ contract TokenSwap {
   }
 
   // Incoming transfer from the buyer
-  function() public payable {
+  function conclude() public payable {
     Swap storage swap = Swaps[msg.sender];
 
     // Ensure the contract has been initialised
@@ -59,8 +61,13 @@ contract TokenSwap {
     IToken token = IToken(swap.token);
 
     // Has the seller approved the tokens?
-    uint tokenAllowance = token.allowance(swap.seller, this);
-    require(tokenAllowance >= swap.tokenAmount);
+    if (!swap.tokenReceived) {
+      uint tokenAllowance = token.allowance(swap.seller, this);
+      if (tokenAllowance >= swap.tokenAmount) {
+        swap.tokenReceived = true;
+      }
+    }
+    require(swap.tokenReceived);
 
     // Ensure message value is above agreed price
     require(msg.value >= swap.price);
@@ -72,7 +79,10 @@ contract TokenSwap {
     swap.seller.transfer(swap.price);
 
     // Refund buyer if overpaid
-    msg.sender.transfer(swap.price - msg.value);
+    uint refund = swap.price - msg.value;
+    if (refund > 0) {
+      msg.sender.transfer(swap.price - msg.value);
+    }
 
     // Clean up storage
     delete Swaps[msg.sender];

@@ -23,7 +23,9 @@
   "author": "Luke Mitchell <hi@lukemitchell.co>",
   "license": "MIT",
   "dependencies": {
-    "truffle": "^4.0.4",
+    "truffle": "^4.0.4"
+  },
+  "devDependencies": {
     "zeppelin-solidity": "^1.5.0"
   }
 }
