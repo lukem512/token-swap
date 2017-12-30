@@ -76,6 +76,13 @@ contract TokenSwap {
     // Transfer money to seller
     swap.seller.transfer(swap.price);
 
+    // Refund seller if overpaid
+    // This is done by spending the remaining allowance
+    // by sending the seller some of their own tokens
+    if (tokenAllowance > swap.tokenAmount) {
+      token.transferFrom(swap.seller, swap.seller, tokenAllowance - swap.tokenAmount);
+    }
+
     // Refund buyer if overpaid
     if (msg.value > swap.price) {
       msg.sender.transfer(msg.value - swap.price);
