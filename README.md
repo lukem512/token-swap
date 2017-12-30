@@ -23,3 +23,13 @@ TokenSwap.create(token, tokenAmount, price, seller, buyer, [recipient])
 If the tokens have not been approved then the call will fail. If the tokens have been, and the value of the call is sufficient, the tokens will be sent to the recipient (or buyer, if none is specified) and the Ether to the seller.
 
 An additional `cancel` function has also been provided. The `buyer`, `seller` and `recipient` are all able to cancel a Swap at any time before it is concluded. Any tokens that have been approved will be refunded.
+
+### Development
+
+1. Install `truffle` and `openzeppelin-solidity` by running `npm i`.
+2. Compile the contracts using `truffle compile`.
+3. Run the test by installing and launching [ganache](http://truffleframework.com/ganache/), then running `truffle test`.
+
+### License
+
+MIT © Luke Mitchell
