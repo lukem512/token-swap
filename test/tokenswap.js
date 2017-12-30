@@ -35,7 +35,7 @@ contract('TokenSwap', function(accounts) {
 
   it("seller can approve TokenSwap contract", function() {
     return ts.create(token.address, amount, price, seller, buyer, {from: buyer})
-    .then(function() {
+    .then(function(events) {
       return token.approve(ts.address, amount, {from: seller});
     });
 
@@ -95,5 +95,22 @@ contract('TokenSwap', function(accounts) {
 
       // TODO: check that it was sent back to the buyer
     });
+  });
+
+  it("seller should be refunded extra tokens", function() {
+    var contractBalance;
+    var extra = 100;
+
+    return ts.create(token.address, amount, price, seller, buyer, {from: buyer})
+    .then(function() {
+      return token.approve(ts.address, amount + extra, {from: seller});
+    }).then(function() {
+      return ts.conclude({from: buyer, value: price});
+    }).then(function() {
+      return token.allowance(seller, ts.address);
+    }).then(function(tokenAllowance) {
+      console.log(tokenAllowance.toNumber());
+      assert.equal(0, tokenAllowance.toNumber());
+    })
   });
 });
