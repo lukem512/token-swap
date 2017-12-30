@@ -109,7 +109,6 @@ contract('TokenSwap', function(accounts) {
     }).then(function() {
       return token.allowance(seller, ts.address);
     }).then(function(tokenAllowance) {
-      console.log(tokenAllowance.toNumber());
       assert.equal(0, tokenAllowance.toNumber());
     })
   });
