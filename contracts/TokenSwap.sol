@@ -54,16 +54,13 @@ contract TokenSwap {
   }
 
   function conclude() public payable {
-    Swap storage swap = Swaps[msg.sender];
-
     // Ensure the Swap has been initialised
     // by calling `create`
+    Swap storage swap = Swaps[msg.sender];
     require(swap.token != 0);
 
-    // Token interface
-    IToken token = IToken(swap.token);
-
     // Has the seller approved the tokens?
+    IToken token = IToken(swap.token);
     uint tokenAllowance = token.allowance(swap.seller, this);
     require(tokenAllowance >= swap.tokenAmount);
 
@@ -90,6 +87,29 @@ contract TokenSwap {
 
     // Clean up storage
     delete Swaps[msg.sender];
+  }
+
+  function cancel(address buyer) public {
+    // Ensure the Swap exists
+    Swap storage swap = Swaps[buyer];
+    require(swap.token != 0);
+
+    // Ensure the sender is authorised to cancel
+    require(
+      msg.sender == buyer ||
+      msg.sender == swap.seller ||
+      msg.sender == swap.recipient ||
+      msg.sender == owner);
+
+    // Refund any tokens that have been authorised
+    IToken token = IToken(swap.token);
+    uint tokenAllowance = token.allowance(swap.seller, this);
+    if (tokenAllowance > 0) {
+      token.transferFrom(swap.seller, swap.seller, tokenAllowance);
+    }
+
+    // Delete the swap
+    delete Swaps[buyer];
   }
 
   function kill() public owneronly {
