@@ -41,6 +41,11 @@ contract TokenSwap {
   mapping (address => Swap) public Swaps;
 
   function create(address token, uint tokenAmount, uint price, address seller, address buyer, address recipient) public {
+    // Ensure a Swap with the buyer does not exist already
+    Swap storage swap = Swaps[buyer];
+    require(swap.token == 0);
+
+    // Add a new Swap to storage
     Swaps[buyer] = Swap(token, tokenAmount, price, seller, recipient);
   }
 
@@ -48,11 +53,10 @@ contract TokenSwap {
      create(token, tokenAmount, price, seller, buyer, buyer);
   }
 
-  // Incoming transfer from the buyer
   function conclude() public payable {
     Swap storage swap = Swaps[msg.sender];
 
-    // Ensure the contract has been initialised
+    // Ensure the Swap has been initialised
     // by calling `create`
     require(swap.token != 0);
 
