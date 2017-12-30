@@ -6,7 +6,7 @@ pragma solidity ^0.4.17;
 
 // Usage:
 // 1. call `create` to begin the swap
-// 2. the seller approves the TokenSwap to spend the amount of tokens
+// 2. the seller approves the TokenSwap contract to spend the amount of tokens
 // 3. the buyer transfers the required amount to ETH to release the tokens
 
 contract IToken {
