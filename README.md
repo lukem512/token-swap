@@ -1,6 +1,8 @@
 # Token Swap
 
-Swap Ether and ERC20 tokens on the Ethereum network
+Swap Ether and ERC20 tokens on the Ethereum network. This is beta software so, please, use with caution. 
+
+If you found this helpful then you can buy me a beer at 0xA459552915C85d079b2EC8e28024314a538f3fd3.
 
 ### Usage
 
